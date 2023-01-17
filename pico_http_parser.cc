@@ -1,14 +1,15 @@
 #include "pico_http_parser.h"
 
 #include <string_view>
+#include <utility>
 
 #include "pico_http_request.h"
 #include "picohttpparser.h"
 
 namespace phpcc {
 
-PicoHttpRequest
-PicoHttpParser::ParseRequest(std::string_view req_buff, size_t last_len) const {
+std::pair<PicoHttpRequest, ParseStatus>
+PicoHttpParser::ParseRequest(std::string_view req_buff, size_t last_len) const noexcept {
     const char *method;
     size_t method_len;
     const char *path;
@@ -29,13 +30,14 @@ PicoHttpParser::ParseRequest(std::string_view req_buff, size_t last_len) const {
             &num_headers,
             last_len);
 
+    PicoHttpRequest req;
+
     if (ret == -1)
-        throw std::domain_error("Unable to parse request.");
+        return std::make_pair(req, ParseStatus::Err);
 
     if (ret == -2)
-        throw std::underflow_error("Request is incomplete.");
+        return std::make_pair(req, ParseStatus::Incomplete);
 
-    PicoHttpRequest req;
     req.buffer = req_buff;
     req.method = std::string_view(method, method_len);
     req.path = std::string_view(path, path_len);
@@ -49,7 +51,7 @@ PicoHttpParser::ParseRequest(std::string_view req_buff, size_t last_len) const {
         req.headers.emplace(header_name, header_value);
     }
 
-    return req;
+    return std::make_pair(req, ParseStatus::Ok);
 }
 
 } // namespace phpcc

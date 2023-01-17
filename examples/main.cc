@@ -7,7 +7,7 @@
 
 using namespace phpcc;
 
-constexpr std::string_view kSimple = 
+constexpr std::string_view kSimple =
     "GET /wp-content/uploads/2010/03/hello-kitty-darth-vader-pink.jpg HTTP/1.1\r\n"
     "Host: www.kittyhell.com\r\n"
     "User-Agent: Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; ja-JP-mac; rv:1.9.2.3) Gecko/20100401 Firefox/3.6.3 "
@@ -23,7 +23,7 @@ constexpr std::string_view kSimple =
     "__utmz=xxxxxxxxx.xxxxxxxxxx.x.x.utmccn=(referral)|utmcsr=reader.livedoor.com|utmcct=/reader/|utmcmd=referral\r\n"
     "\r\n";
 
-constexpr std::string_view kMultipart = 
+constexpr std::string_view kMultipart =
     "POST /cgi-bin/qtest HTTP/1.1\r\n"
     "Host: aram\r\n"
     "User-Agent: Mozilla/5.0 Gecko/2009042316 Firefox/3.0.10\r\n"
@@ -58,14 +58,19 @@ int
 main()
 {
     PicoHttpParser parser;
-    PicoHttpRequest req;
 
     for (std::string_view request_str : {kSimple, kMultipart}) {
-        try {
-            req = parser.ParseRequest(request_str);
-        } catch (std::exception e) {
-            std::cerr << "Error: " << e.what() << std::endl;
-            return 1;
+        auto [req, status] = parser.ParseRequest(request_str);
+
+        switch (status) {
+            case ParseStatus::Incomplete:
+                std::cerr << "Request is incomplete." << std::endl;
+                return 1;
+            case ParseStatus::Err:
+                std::cerr << "Unable to parse request." << std::endl;
+                return 1;
+            default:
+                break;
         }
 
         std::cout << "All GOOD!\n";
@@ -77,7 +82,7 @@ main()
         std::cout << "num_headers=" << req.headers.size() << std::endl;
 
         for (const auto& [key, val] : req.headers)
-            std::cout << '\t' << key << ':' << val << std::endl; 
+            std::cout << '\t' << key << ':' << val << std::endl;
     }
 
     return 0;

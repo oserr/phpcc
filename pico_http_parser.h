@@ -1,10 +1,17 @@
 #pragma once
 
 #include <stdexcept>
+#include <utility>
 
 #include "pico_http_request.h"
 
 namespace phpcc {
+
+enum class ParseStatus {
+    Ok,
+    Err,
+    Incomplete
+};
 
 class PicoHttpParser {
 public:
@@ -25,8 +32,8 @@ public:
     PicoHttpParser&
     operator=(PicoHttpParser&& parser) = default;
 
-    PicoHttpRequest
-    ParseRequest(std::string_view req_buff, size_t last_len = 0) const; 
+    std::pair<PicoHttpRequest, ParseStatus>
+    ParseRequest(std::string_view req_buff, size_t last_len = 0) const noexcept;
 
 private:
     size_t max_headers_ = 512;
