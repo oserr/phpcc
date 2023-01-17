@@ -18,12 +18,13 @@ if(NOT picohttpparser)
   add_subdirectory(${picohttpparser_SOURCE_DIR} ${picohttpparser_BINARY_DIR})
 endif()
 
-include_directories(${picohttpparser_SOURCE_DIR})
+set(phpcc_project_dir ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(phpcc 
     pico_http_request.h
     pico_http_parser.h
     pico_http_parser.cc)
+target_include_directories(phpcc PRIVATE ${picohttpparser_SOURCE_DIR})
 target_link_libraries(phpcc PRIVATE picohttpparser)
 
 add_subdirectory(examples)

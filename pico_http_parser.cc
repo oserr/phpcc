@@ -22,7 +22,7 @@ const noexcept
 
   int ret = phr_parse_request(
           req_buff.data(),
-          eq_buff.size(),
+          req_buff.size(),
           &method,
           &method_len,
           &path,
