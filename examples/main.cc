@@ -57,33 +57,33 @@ constexpr std::string_view kMultipart =
 int
 main()
 {
-    PicoHttpParser parser;
+  PicoHttpParser parser;
 
-    for (std::string_view request_str : {kSimple, kMultipart}) {
-        auto [req, status] = parser.ParseRequest(request_str);
+  for (std::string_view request_str : {kSimple, kMultipart}) {
+    auto [req, status] = parser.ParseRequest(request_str);
 
-        switch (status) {
-            case ParseStatus::Incomplete:
-                std::cerr << "Request is incomplete." << std::endl;
-                return 1;
-            case ParseStatus::Err:
-                std::cerr << "Unable to parse request." << std::endl;
-                return 1;
-            default:
-                break;
-        }
-
-        std::cout << "All GOOD!\n";
-        std::cout << "method=" << req.method << std::endl;
-        std::cout << "path=" << req.path << std::endl;
-        std::cout << "minor_version=" << req.minor_version << std::endl;
-        std::cout << "buff_size=" << req.buffer.size() << std::endl;
-        std::cout << "bytes_read=" << req.bytes_read << std::endl;
-        std::cout << "num_headers=" << req.headers.size() << std::endl;
-
-        for (const auto& [key, val] : req.headers)
-            std::cout << '\t' << key << ':' << val << std::endl;
+    switch (status) {
+    case ParseStatus::Incomplete:
+      std::cerr << "Request is incomplete." << std::endl;
+      return 1;
+    case ParseStatus::Err:
+      std::cerr << "Unable to parse request." << std::endl;
+      return 1;
+    default:
+      break;
     }
 
-    return 0;
+    std::cout << "All GOOD!\n";
+    std::cout << "method=" << req.method << std::endl;
+    std::cout << "path=" << req.path << std::endl;
+    std::cout << "minor_version=" << req.minor_version << std::endl;
+    std::cout << "buff_size=" << req.buffer.size() << std::endl;
+    std::cout << "bytes_read=" << req.bytes_read << std::endl;
+    std::cout << "num_headers=" << req.headers.size() << std::endl;
+
+    for (const auto& [key, val] : req.headers)
+      std::cout << '\t' << key << ':' << val << std::endl;
+  }
+
+  return 0;
 }
